@@ -6,6 +6,21 @@
 <meta name="robots" content="noindex,nofollow">
 <title>РИ-161123</title>
 <link rel="stylesheet" href="style.css">
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=113265364', 'ym');
+
+    ym(113265364, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/113265364" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
 <script>
   /* Тема применяется до отрисовки — без «мигания» */
   (function () {
@@ -30,7 +45,10 @@
         <div class="brand-text">
           <h1 id="group-title">РИ-161123</h1>
           <p>записи онлайнов · <span id="stats"></span></p>
-		  <p>В целях экономии ресурсов записи будут обрабатываться в ночное время. Записи будут доступны на следующий день.</p>
+          <p class="updated">
+            <span>Обновлено <span id="last-update">—</span></span>
+          </p>
+          <p class="notice">В целях экономии ресурсов записи обрабатываются в ночное время.</p>
         </div>
       </div>
 
@@ -74,9 +92,12 @@
    РЕДАКТИРУЙ ТОЛЬКО ЭТОТ БЛОК
    Чтобы добавить предмет — скопируй блок { name, teacher, lessons: [...] }
    Чтобы добавить занятие — добавь строку в lessons нужного предмета
+
+   ВАЖНО: при каждом обновлении файла меняй lastUpdate — это увидят посетители
    ========================================================== */
 const DATA = {
-  groupName: "РИ-161123 ",
+  groupName: "РИ-161123",
+  lastUpdate: "2026-10-01",   /* ← дата последнего обновления (ГГГГ-ММ-ДД) */
   subjects: [
     {
       name: "Векторный анализ (вектан)",
@@ -84,21 +105,21 @@ const DATA = {
       lessons: [
         { date: "2026-09-17", pair: 4, teacher: "Маркина А. С.", link: "https://vkvideo.ru/video-241871835_456239019?list=ln-rjO7v7znQVrxoFX8zd", comment: "Вводная лекция, теория комплексных чисел" },
         { date: "2026-09-24", pair: 4, teacher: "Маркина А. С.", link: "https://elearn.urfu.ru/mod/url/view.php?id=307777", comment: "комплексные числа, геом. интерпритация, показательная форма. у меня записи нет, ищите тут (лекция 2)" },
-		{ date: "2026-10-01", pair: 4, teacher: "Маркина А. С.", link: "https://elearn.urfu.ru/mod/url/view.php?id=307777", comment: "у меня записи не будет, ищите тут (лекция 3)" }
+        { date: "2026-10-01", pair: 4, teacher: "Маркина А. С.", link: "https://elearn.urfu.ru/mod/url/view.php?id=307777", comment: "у меня записи не будет, ищите тут (лекция 3)" }
       ]
     },
-	{
+    {
       name: "Математика практика",
       teacher: "Лобанова Мария",
       lessons: [
         { date: "2026-09-17", pair: 6, teacher: "Лобанова М.", link: "", comment: "Запись в обработке еще пару часов. Пожалуйста, подождите" },
         { date: "2026-09-22", pair: 3, teacher: "Лобанова М.", link: "", comment: "Запись в обработке еще пару часов. Пожалуйста, подождите" },
-		{ date: "2026-09-24", pair: 6, teacher: "Лобанова М.", link: "", comment: "Запись в обработке еще пару часов. Пожалуйста, подождите" },
-		{ date: "2026-10-01", pair: 6, teacher: "Лобанова М.", link: "", comment: "Запись в обработке еще пару часов. Пожалуйста, подождите" },
-		{ date: "2026-10-01", pair: 7, teacher: "Лобанова М.", link: "", comment: "не этой паре решали задачи, записи нет" }
+        { date: "2026-09-24", pair: 6, teacher: "Лобанова М.", link: "", comment: "Запись в обработке еще пару часов. Пожалуйста, подождите" },
+        { date: "2026-10-01", pair: 6, teacher: "Лобанова М.", link: "", comment: "Запись в обработке еще пару часов. Пожалуйста, подождите" },
+        { date: "2026-10-01", pair: 7, teacher: "Лобанова М.", link: "", comment: "не этой паре решали задачи, записи нет" }
       ]
     },
-	{
+    {
       name: "Математика",
       teacher: "Власова Алиса Михайловна",
       lessons: [
@@ -135,10 +156,10 @@ const DATA = {
       lessons: [
         { date: "2026-09-16", pair: 3, teacher: "Горбачев А. О.", link: "https://vkvideo.ru/video-241871835_456239023?list=ln-EEzjAyyqNGYQMmIaUg", comment: "вводное занятие" },
         { date: "2026-09-23", pair: 3, teacher: "Горбачев А. О.", link: "", comment: "записи не было( были только презентации" },
-		{ date: "2026-09-30", pair: 3, teacher: "Горбачев А. О.", link: "https://vkvideo.ru/video-241871835_456239021?list=ln-XA393qTXSex2tYEMQL", comment: "были только презентации" }
+        { date: "2026-09-30", pair: 3, teacher: "Горбачев А. О.", link: "https://vkvideo.ru/video-241871835_456239021?list=ln-XA393qTXSex2tYEMQL", comment: "были только презентации" }
       ]
     },
-	{
+    {
       name: "Компьютерная и инженерная графика",
       teacher: "Семенова Наталья Владимировна",
       lessons: [
@@ -190,12 +211,12 @@ function dateParts(iso) {
   return { d: p[2], m, y: p[0] };
 }
 
-function fmtDate(iso) {                 // 17.09.2026
+function fmtDate(iso) {
   const p = dateParts(iso);
   return p ? `${p.d}.${String(p.m + 1).padStart(2, "0")}.${p.y}` : (iso || "—");
 }
 
-function fmtLong(iso) {                 // 17 сентября 2026
+function fmtLong(iso) {
   const p = dateParts(iso);
   return p ? `${parseInt(p.d, 10)} ${MONTHS_FULL[p.m]} ${p.y}` : (iso || "—");
 }
@@ -230,6 +251,27 @@ $("#group-title").textContent = DATA.groupName;
 
 const TOTAL = DATA.subjects.reduce((n, s) => n + s.lessons.length, 0);
 $("#stats").textContent = `${TOTAL} ${plural(TOTAL, "запись", "записи", "записей")}`;
+
+/* ---------- дата последнего обновления ---------- */
+(function () {
+  const el = $("#last-update");
+  if (!el) return;
+  const iso = DATA.lastUpdate;
+  if (!iso) { el.textContent = "не указано"; return; }
+
+  el.textContent = fmtLong(iso);
+
+  const p = dateParts(iso);
+  if (!p) return;
+
+  const diff = Math.floor((Date.now() - new Date(iso + "T00:00:00").getTime()) / 86400000);
+  if (diff >= 0 && diff <= 30) {
+    el.parentElement.parentElement.classList.add("fresh");
+    el.title = diff === 0 ? "Обновлено сегодня"
+             : diff === 1 ? "Обновлено вчера"
+             : `Обновлено ${diff} ${plural(diff, "день", "дня", "дней")} назад`;
+  }
+})();
 
 /* ---------- рендер ---------- */
 let allOpen = false;
