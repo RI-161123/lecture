@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>РИ-161123</title>
+<link rel="stylesheet" href="style.css">
+<script>
+  /* Тема применяется до отрисовки — без «мигания» */
+  (function () {
+    try {
+      var t = localStorage.getItem("ri-theme");
+      if (!t) t = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      document.documentElement.dataset.theme = t;
+    } catch (e) {
+      document.documentElement.dataset.theme = "dark";
+    }
+  })();
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+
+    <div class="brand-row">
+      <div class="brand">
+        <span class="brand-mark">РИ</span>
+        <div class="brand-text">
+          <h1 id="group-title">РИ-161123</h1>
+          <p>записи онлайнов · <span id="stats"></span></p>
+		  <p>В целях экономии ресурсов записи будут обрабатываться в ночное время. Записи будут доступны на следующий день.</p>
+        </div>
+      </div>
+
+      <button class="icon-btn" id="theme" type="button" aria-label="Переключить тему">
+        <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+        </svg>
+        <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4.2"></circle>
+          <path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="search-row">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+        </svg>
+        <input type="search" id="search" placeholder="Поиск: предмет, преподаватель, дата…" autocomplete="off">
+        <button class="clear-btn" id="clear" type="button" aria-label="Очистить" hidden>✕</button>
+      </div>
+      <button class="ghost-btn" id="toggle-all" type="button">Развернуть</button>
+    </div>
+
+  </div>
+</header>
+
+<main id="subjects"></main>
+
+<div class="modal" id="modal">
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="close" id="close" type="button" aria-label="Закрыть">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+/* ==========================================================
+   РЕДАКТИРУЙ ТОЛЬКО ЭТОТ БЛОК
+   Чтобы добавить предмет — скопируй блок { name, teacher, lessons: [...] }
+   Чтобы добавить занятие — добавь строку в lessons нужного предмета
+   ========================================================== */
+const DATA = {
+  groupName: "РИ-161123 ",
+  subjects: [
+    {
+      name: "Векторный анализ (вектан)",
+      teacher: "Маркина Анна Сергеевна",
+      lessons: [
+        { date: "2026-09-17", pair: 4, teacher: "Маркина А. С.", link: "https://vkvideo.ru/video-241871835_456239019?list=ln-rjO7v7znQVrxoFX8zd", comment: "Вводная лекция, теория комплексных чисел" },
+        { date: "2026-09-24", pair: 4, teacher: "Маркина А. С.", link: "https://elearn.urfu.ru/mod/url/view.php?id=307777", comment: "комплексные числа, геом. интерпритация, показательная форма. у меня записи нет, ищите тут (лекция 2)" },
+		{ date: "2026-10-01", pair: 4, teacher: "Маркина А. С.", link: "https://elearn.urfu.ru/mod/url/view.php?id=307777", comment: "у меня записи не будет, ищите тут (лекция 3)" }
+      ]
+    },
+	{
+      name: "Математика",
+      teacher: "Власова Алиса Михайловна",
+      lessons: [
+        { date: "2026-09-17", pair: 4, teacher: "Власова А. М.", link: "https://vkvideo.ru/video-241871835_456239019?list=ln-rjO7v7znQVrxoFX8zd", comment: "Вводная лекция, теория комплексных чисел" },
+        { date: "2026-09-24", pair: 4, teacher: "Власова А. М.", link: "https://elearn.urfu.ru/mod/url/view.php?id=307777", comment: "комплексные числа, геом. интерпритация, показательная форма. у меня записи нет, ищите тут (лекция 2)" }
+      ]
+    },
+    {
+      name: "Физика Лекция",
+      teacher: "Резник Павел Львович",
+      lessons: [
+        { date: "2026-09-16", pair: 5, teacher: "Резник П. Л.", link: "https://vkvideo.ru/video-241871835_456239017?list=ln-3RRYYeyEr1R5SVz01U", comment: "Механика" },
+        { date: "2026-09-23", pair: 5, teacher: "Резник П. Л.", link: "https://vkvideo.ru/video-241871835_456239018?list=ln-IymYRDjrZvaJx5T0Rk", comment: "Механическая энергия" }
+      ]
+    },
+    {
+      name: "Физика Практика",
+      teacher: "Нечкин Алексей Станиславович",
+      lessons: [
+        { date: "2026-09-21", pair: 6, teacher: "Нечкин А. С.", link: "https://vkvideo.ru/video-241871835_456239020?list=ln-k9jO3N6USVWNI6ZFFH", comment: "Механика, движение тел" }
+      ]
+    },
+    {
+      name: "Основы проектной деятельности (ОПД)",
+      teacher: "Летавин Денис Александрович",
+      lessons: [
+        { date: "2026-09-16", pair: 7, teacher: "Летавин Д. А.", link: "https://vkvideo.ru/video-241871835_456239024?list=ln-mOwpy5gNIpNmEjHMuR", comment: "попытка срыва пары вырезана)" },
+        { date: "2026-09-23", pair: 7, teacher: "Летавин Д. А.", link: "", comment: "не очень информативная лекция" }
+      ]
+    },
+    {
+      name: "Основы российской государственности (ОРГ)",
+      teacher: "Горбачев Антон Олегович",
+      lessons: [
+        { date: "2026-09-16", pair: 3, teacher: "Горбачев А. О.", link: "https://vkvideo.ru/video-241871835_456239023?list=ln-EEzjAyyqNGYQMmIaUg", comment: "вводное занятие" },
+        { date: "2026-09-23", pair: 3, teacher: "Горбачев А. О.", link: "", comment: "записи не было( были только презентации" },
+		{ date: "2026-09-30", pair: 3, teacher: "Горбачев А. О.", link: "https://vkvideo.ru/video-241871835_456239021?list=ln-XA393qTXSex2tYEMQL", comment: "были только презентации" }
+      ]
+    },
+	{
+      name: "Компьютерная и инженерная графика",
+      teacher: "Семенова Наталья Владимировна",
+      lessons: [
+        { date: "2026-09-16", pair: 3, teacher: "Семенова Н. В.", link: "", comment: "записи не было(" },
+        { date: "2026-09-23", pair: 3, teacher: "Семенова Н. В.", link: "", comment: "записи не было(" }
+      ]
+    },
+    {
+      name: "Физическая культура",
+      teacher: " - ",
+      lessons: [
+        { date: "2026-09-01", pair: 0, teacher: " - ", link: "https://exam1.urfu.ru", comment: "выполняем задания на сайте согласно графика" }
+      ]
+    }
+  ]
+};
+/* ==========================================================
+   КОНЕЦ БЛОКА РЕДАКТИРОВАНИЯ
+   ========================================================== */
+
+const root = document.documentElement;
+const $ = (s) => document.querySelector(s);
+
+const main        = $("#subjects");
+const search      = $("#search");
+const clearBtn    = $("#clear");
+const modal       = $("#modal");
+const modalBody   = $("#modal-body");
+const closeBtn    = $("#close");
+const toggleAllBtn= $("#toggle-all");
+const themeBtn    = $("#theme");
+
+const MONTHS_SHORT = ["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"];
+const MONTHS_FULL  = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+
+/* ---------- утилиты ---------- */
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+
+function dateParts(iso) {
+  if (!iso) return null;
+  const p = String(iso).split("-");
+  if (p.length !== 3) return null;
+  const m = parseInt(p[1], 10) - 1;
+  if (isNaN(m) || m < 0 || m > 11) return null;
+  return { d: p[2], m, y: p[0] };
+}
+
+function fmtDate(iso) {                 // 17.09.2026
+  const p = dateParts(iso);
+  return p ? `${p.d}.${String(p.m + 1).padStart(2, "0")}.${p.y}` : (iso || "—");
+}
+
+function fmtLong(iso) {                 // 17 сентября 2026
+  const p = dateParts(iso);
+  return p ? `${parseInt(p.d, 10)} ${MONTHS_FULL[p.m]} ${p.y}` : (iso || "—");
+}
+
+function plural(n, one, few, many) {
+  const a = n % 10, b = n % 100;
+  if (a === 1 && b !== 11) return one;
+  if (a >= 2 && a <= 4 && (b < 10 || b >= 20)) return few;
+  return many;
+}
+
+function initials(name) {
+  const clean = String(name).replace(/\(.*?\)/g, " ").trim();
+  const words = clean.split(/\s+/).filter(Boolean);
+  return ((words[0] ? words[0][0] : "?") + (words[1] ? words[1][0] : "")).toUpperCase();
+}
+
+function hueOf(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 360;
+  return h;
+}
+
+function markStyle(name) {
+  const h = hueOf(name);
+  return `background:linear-gradient(135deg,hsl(${h} 72% 58%),hsl(${(h + 45) % 360} 72% 48%))`;
+}
+
+/* ---------- шапка ---------- */
+document.title = DATA.groupName;
+$("#group-title").textContent = DATA.groupName;
+
+const TOTAL = DATA.subjects.reduce((n, s) => n + s.lessons.length, 0);
+$("#stats").textContent = `${TOTAL} ${plural(TOTAL, "запись", "записи", "записей")}`;
+
+/* ---------- рендер ---------- */
+let allOpen = false;
+
+function matchesQuery(subj, l, words) {
+  const hay = [
+    subj.name,
+    l.teacher || subj.teacher || "",
+    l.comment || "",
+    fmtDate(l.date),
+    fmtLong(l.date),
+    l.pair ? l.pair + " пара" : ""
+  ].join(" ").toLowerCase();
+  return words.every(w => hay.includes(w));
+}
+
+function lessonHTML(subj, l, si, li) {
+  const p     = dateParts(l.date);
+  const day   = p ? String(parseInt(p.d, 10)) : "—";
+  const mon   = p ? MONTHS_SHORT[p.m] : "";
+  const teach = (l.teacher || subj.teacher || "").trim();
+  const meta  = [
+    teach && teach !== "-" ? teach : "",
+    l.pair ? l.pair + " пара" : ""
+  ].filter(Boolean).join(" · ");
+  const hasLink = !!(l.link && String(l.link).trim());
+
+  return `
+    <button class="lesson" type="button" data-si="${si}" data-li="${li}">
+      <span class="lesson-date"><b>${esc(day)}</b><i>${esc(mon)}</i></span>
+      <span class="lesson-main">
+        <span class="lesson-title">${esc(l.comment || "Занятие")}</span>
+        <span class="lesson-meta">${esc(meta || "—")}</span>
+      </span>
+      <span class="pill${hasLink ? " on" : ""}">
+        <i class="dot"></i><span>${hasLink ? "запись" : "нет записи"}</span>
+      </span>
+    </button>`;
+}
+
+function render() {
+  const q     = search.value.trim().toLowerCase();
+  const words = q ? q.split(/\s+/).filter(Boolean) : [];
+  clearBtn.hidden = !q;
+
+  let html = "";
+  let found = 0;
+
+  DATA.subjects.forEach((subj, si) => {
+    const items = subj.lessons
+      .map((l, li) => ({ l, li }))
+      .filter(({ l }) => !words.length || matchesQuery(subj, l, words));
+
+    if (words.length && !items.length) return;
+    found += items.length;
+
+    const isOpen = words.length > 0 || allOpen;
+    const teacher = (subj.teacher || "").trim();
+
+    html += `
+      <section class="subject${isOpen ? " open" : ""}">
+        <button class="subject-header" type="button" aria-expanded="${isOpen}">
+          <span class="subj-mark" style="${markStyle(subj.name)}">${esc(initials(subj.name))}</span>
+          <span class="subj-info">
+            <span class="subj-name">${esc(subj.name)}</span>
+            <span class="subj-teacher">${esc(teacher && teacher !== "-" ? teacher : "преподаватель не указан")}</span>
+          </span>
+          <span class="count">${items.length}</span>
+          <span class="chev" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </span>
+        </button>
+        <div class="subject-body">
+          <div class="subject-inner">
+            <div class="lessons">
+              ${items.length
+                ? items.map(({ l, li }) => lessonHTML(subj, l, si, li)).join("")
+                : `<div class="no-lessons">Занятий пока нет</div>`}
+            </div>
+          </div>
+        </div>
+      </section>`;
+  });
+
+  main.innerHTML = found ? html : `
+    <div class="empty">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+        </svg>
+      </div>
+      <p>Ничего не найдено</p>
+      <span>Попробуйте изменить запрос</span>
+    </div>`;
+}
+
+/* ---------- клики по списку ---------- */
+main.addEventListener("click", (e) => {
+  const header = e.target.closest(".subject-header");
+  if (header) {
+    const sec = header.closest(".subject");
+    const open = sec.classList.toggle("open");
+    header.setAttribute("aria-expanded", String(open));
+    return;
+  }
+  const lesson = e.target.closest(".lesson");
+  if (lesson) openModal(+lesson.dataset.si, +lesson.dataset.li);
+});
+
+/* ---------- модалка ---------- */
+function openModal(si, li) {
+  const subj = DATA.subjects[si];
+  const l = subj && subj.lessons[li];
+  if (!l) return;
+
+  const teacher = (l.teacher || subj.teacher || "").trim() || "—";
+  const hasLink = !!(l.link && String(l.link).trim());
+
+  modalBody.innerHTML = `
+    <div class="m-head">
+      <span class="subj-mark" style="${markStyle(subj.name)}">${esc(initials(subj.name))}</span>
+      <div class="m-head-text">
+        <h3>${esc(subj.name)}</h3>
+        <p>${esc(teacher)}</p>
+      </div>
+    </div>
+
+    <div class="m-grid">
+      <div class="m-row"><span class="m-label">Дата</span><span class="m-value">${esc(fmtLong(l.date))}</span></div>
+      <div class="m-row"><span class="m-label">Пара</span><span class="m-value">${l.pair ? esc(l.pair) + "-я пара" : "—"}</span></div>
+      <div class="m-row"><span class="m-label">Заметка</span><span class="m-value">${esc(l.comment || "—")}</span></div>
+    </div>
+
+    ${hasLink
+      ? `<a class="watch" href="${esc(l.link)}" target="_blank" rel="noopener">
+           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Перейти по ссылке
+         </a>`
+      : `<div class="no-link"><i class="dot"></i> Ссылка не указана</div>`}
+  `;
+
+  modal.classList.add("open");
+  document.body.classList.add("no-scroll");
+  closeBtn.focus();
+}
+
+function closeModal() {
+  modal.classList.remove("open");
+  document.body.classList.remove("no-scroll");
+}
+
+closeBtn.addEventListener("click", closeModal);
+modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
+});
+
+/* ---------- поиск ---------- */
+search.addEventListener("input", render);
+clearBtn.addEventListener("click", () => {
+  search.value = "";
+  render();
+  search.focus();
+});
+
+/* ---------- развернуть / свернуть всё ---------- */
+toggleAllBtn.addEventListener("click", () => {
+  allOpen = !allOpen;
+  toggleAllBtn.textContent = allOpen ? "Свернуть" : "Развернуть";
+  main.querySelectorAll(".subject").forEach(sec => {
+    sec.classList.toggle("open", allOpen);
+    const h = sec.querySelector(".subject-header");
+    if (h) h.setAttribute("aria-expanded", String(allOpen));
+  });
+});
+
+/* ---------- тема ---------- */
+themeBtn.addEventListener("click", () => {
+  const next = root.dataset.theme === "light" ? "dark" : "light";
+  root.dataset.theme = next;
+  try { localStorage.setItem("ri-theme", next); } catch (e) {}
+});
+
+render();
+</script>
+</body>
+</html>
