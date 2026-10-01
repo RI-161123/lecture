@@ -648,3 +648,48 @@ main {
 body, .subject, .topbar, .modal-box, #search, .icon-btn, .ghost-btn {
   transition: background-color .25s ease, border-color .25s ease, color .25s ease;
 }
+
+/* ===== ДАТА ОБНОВЛЕНИЯ ===== */
+.brand-text .updated {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 0;
+  font-size: .72rem;
+  color: var(--muted);
+  letter-spacing: .01em;
+}
+
+.brand-text .updated::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  opacity: .55;
+  flex-shrink: 0;
+}
+
+.brand-text .updated.fresh {
+  color: #4ade80;
+}
+.brand-text .updated.fresh::before {
+  background: #4ade80;
+  opacity: 1;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #4ade80 22%, transparent);
+}
+
+/* Примечание про ночную обработку */
+.brand-text .notice {
+  margin: 6px 0 0;
+  font-size: .72rem;
+  line-height: 1.4;
+  color: var(--muted);
+  max-width: 460px;
+  opacity: .85;
+}
+
+@media (max-width: 600px) {
+  .brand-text .updated { font-size: .68rem; }
+  .brand-text .notice  { font-size: .68rem; max-width: none; }
+}
